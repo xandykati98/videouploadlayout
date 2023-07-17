@@ -3,6 +3,7 @@ import Link from "next/link";
 import React, {useCallback, useState} from 'react'
 import {useDropzone} from 'react-dropzone'
 import { set } from "zod";
+import axios from 'axios';
 
 function MyDropzone(props:any) {
   const {getRootProps, getInputProps, isDragActive} = useDropzone({
@@ -59,13 +60,14 @@ export default function Home() {
     try {
       const formData = new FormData()
       formData.append('file', selectedFile as File)
-      const response = await fetch('http://localhost:3000/api/vimeo', { // adicionar rota pro treco de upload
-        // seria bom essa rota vincular a resposta do upload (url) ao video no banco
-        method: 'POST',
-        body: formData
-      })
-      const data = await response.json()
       
+      const response = await axios.post('https://api.vimeo.com/me/videos', formData, {
+        headers: {
+          Authorization: 'Bearer 39c51538988cfc7e16ac0d2dff8e50b6',
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      const data = response.data
       console.log({data})
     } catch (error) {
       console.log(error)
