@@ -54,21 +54,29 @@ export default function Home() {
     }
     setLoading(false)
   }
-
+  const [formHtmlVimeo, setFormHtmlVimeo] = useState(null)
   const uploadToVimeo = async () => {
     setLoading(true)
     try {
-      const formData = new FormData()
-      formData.append('file', selectedFile as File)
-      
-      const response = await axios.post('https://api.vimeo.com/me/videos', formData, {
+      const requestBody = {
+        upload: {
+          approach: 'post',
+          size: (selectedFile as File).size,
+          redirect_url: 'http://localhost:3000/'
+        }
+      }
+
+      const response = await axios.post('https://api.vimeo.com/me/videos', requestBody, {
         headers: {
-          Authorization: 'Bearer 39c51538988cfc7e16ac0d2dff8e50b6',
-          'Content-Type': 'multipart/form-data',
-        },
-      });
+          'Authorization': `Bearer 39c51538988cfc7e16ac0d2dff8e50b6`,
+          'Content-Type': 'application/json',
+          'Accept': 'application/vnd.vimeo.*+json;version=3.4'
+        }
+      })
+
       const data = response.data
       console.log({data})
+      setFormHtmlVimeo(data.upload.form)
     } catch (error) {
       console.log(error)
       alert('Algo deu errado')
@@ -80,6 +88,7 @@ export default function Home() {
   return (
     <>
       <main className="flex min-h-screen flex-col items-center justify-center bg-gradient-to-b from-[#fafafa] to-[#ffffff]">
+        <div dangerouslySetInnerHTML={{ __html: formHtmlVimeo as unknown as string }}></div>
         {
           selectedFile && (
             <div>
